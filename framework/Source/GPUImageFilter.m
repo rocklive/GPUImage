@@ -795,7 +795,7 @@ void dataProviderUnlockCallback (void *info, const void *data, size_t size)
 
 - (void)setUniformsForProgramAtIndex:(NSUInteger)programIndex;
 {
-    [uniformStateRestorationBlocks enumerateKeysAndObjectsUsingBlock:^(id key, id obj, BOOL *stop){
+    [uniformStateRestorationBlocks.copy enumerateKeysAndObjectsUsingBlock:^(id key, id obj, BOOL *stop){
         dispatch_block_t currentBlock = obj;
         currentBlock();
     }];
