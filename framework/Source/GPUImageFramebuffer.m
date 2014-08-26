@@ -322,6 +322,12 @@ void dataProviderUnlockCallback (void *info, const void *data, size_t size)
         
         GLubyte *rawImagePixels;
         
+#if TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE
+        if ([[UIApplication sharedApplication] applicationState] != UIApplicationStateActive) {
+            return;
+        }
+#endif
+
         CGDataProviderRef dataProvider = NULL;
         if ([GPUImageContext supportsFastTextureUpload])
         {
