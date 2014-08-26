@@ -328,6 +328,10 @@ void dataProviderUnlockCallback (void *info, const void *data, size_t size)
         }
 #endif
 
+        if (!renderTarget) {
+            return;
+        }
+
         CGDataProviderRef dataProvider = NULL;
         if ([GPUImageContext supportsFastTextureUpload])
         {
