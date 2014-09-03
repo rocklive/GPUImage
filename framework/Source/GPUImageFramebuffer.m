@@ -328,9 +328,11 @@ void dataProviderUnlockCallback (void *info, const void *data, size_t size)
         }
 #endif
 
+#if !TARGET_IPHONE_SIMULATOR
         if (!renderTarget) {
             return;
         }
+#endif
 
         CGDataProviderRef dataProvider = NULL;
         if ([GPUImageContext supportsFastTextureUpload])
