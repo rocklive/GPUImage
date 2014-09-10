@@ -342,6 +342,10 @@ void reportAvailableMemoryForGPUImage(NSString *tag)
 - (UIImage *)imageByFilteringImage:(UIImage *)imageToFilter;
 {
     CGImageRef image = [self newCGImageByFilteringCGImage:[imageToFilter CGImage]];
+    if (!image) {
+        return nil;
+    }
+
     UIImage *processedImage = [UIImage imageWithCGImage:image scale:[imageToFilter scale] orientation:[imageToFilter imageOrientation]];
     CGImageRelease(image);
     return processedImage;
