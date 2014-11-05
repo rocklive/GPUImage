@@ -312,7 +312,7 @@ void dataProviderUnlockCallback (void *info, const void *data, size_t size)
     NSAssert(self.textureOptions.internalFormat == GL_RGBA, @"For conversion to a CGImage the output texture format for this filter must be GL_RGBA.");
     NSAssert(self.textureOptions.type == GL_UNSIGNED_BYTE, @"For conversion to a CGImage the type of the output texture of this filter must be GL_UNSIGNED_BYTE.");
     
-    __block CGImageRef cgImageFromBytes;
+    __block CGImageRef cgImageFromBytes = NULL;
     
     runSynchronouslyOnVideoProcessingQueue(^{
         [GPUImageContext useImageProcessingContext];
@@ -320,7 +320,7 @@ void dataProviderUnlockCallback (void *info, const void *data, size_t size)
         NSUInteger totalBytesForImage = (int)_size.width * (int)_size.height * 4;
         // It appears that the width of a texture must be padded out to be a multiple of 8 (32 bytes) if reading from it using a texture cache
         
-        GLubyte *rawImagePixels;
+        GLubyte *rawImagePixels = NULL;
         
 #if TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE
         if ([[UIApplication sharedApplication] applicationState] != UIApplicationStateActive) {
