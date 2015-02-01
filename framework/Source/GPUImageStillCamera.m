@@ -118,6 +118,46 @@ void GPUImageCreateResizedSampleBuffer(CVPixelBufferRef cameraFrame, CGSize fina
     return self;
 }
 
+- (id)initWithSessionPreset:(NSString *)sessionPreset cameraPosition:(AVCaptureDevicePosition)cameraPosition photoOutputSettings:(NSDictionary *)photoSettings;
+{
+    if (!(self = [super initWithSessionPreset:AVCaptureSessionPresetPhoto cameraPosition:AVCaptureDevicePositionBack]))
+    {
+        return nil;
+    }
+    
+    /* Detect iOS version < 6 which require a texture cache corruption workaround */
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+    requiresFrontCameraTextureCacheCorruptionWorkaround = [[[UIDevice currentDevice] systemVersion] compare:@"6.0" options:NSNumericSearch] == NSOrderedAscending;
+#pragma clang diagnostic pop
+    
+    [self.captureSession beginConfiguration];
+    
+    photoOutput = [[AVCaptureStillImageOutput alloc] init];
+    
+    // Having a still photo input set to BGRA and video to YUV doesn't work well, so since I don't have YUV resizing for iPhone 4 yet, kick back to BGRA for that device
+    //    if (captureAsYUV && [GPUImageContext supportsFastTextureUpload])
+    if (!(captureAsYUV && [GPUImageContext deviceSupportsRedTextures]))
+    {
+        captureAsYUV = NO;
+        [videoOutput setVideoSettings:[NSDictionary dictionaryWithObject:[NSNumber numberWithInt:kCVPixelFormatType_32BGRA] forKey:(id)kCVPixelBufferPixelFormatTypeKey]];
+    }
+    
+    if (photoSettings!=nil) {
+        [photoOutput setOutputSettings:photoSettings];
+    } else {
+        [photoOutput setOutputSettings:@{AVVideoCodecKey : AVVideoCodecJPEG}];
+    }
+    
+    [self.captureSession addOutput:photoOutput];
+    
+    [self.captureSession commitConfiguration];
+    
+    self.jpegCompressionQuality = 0.8;
+    
+    return self;
+}
+
 - (id)init;
 {
     if (!(self = [self initWithSessionPreset:AVCaptureSessionPresetPhoto cameraPosition:AVCaptureDevicePositionBack]))
@@ -135,6 +175,26 @@ void GPUImageCreateResizedSampleBuffer(CVPixelBufferRef cameraFrame, CGSize fina
 
 #pragma mark -
 #pragma mark Photography controls
+
+- (void)capturePhotoAsJpegData:(void (^)(NSData* jpegData, NSError *error))block
+{
+    dispatch_semaphore_wait(frameRenderingSemaphore, DISPATCH_TIME_FOREVER);
+    
+    AVCaptureConnection *connection = [[photoOutput connections] objectAtIndex:0];
+    
+    [photoOutput captureStillImageAsynchronouslyFromConnection:connection completionHandler:^(CMSampleBufferRef imageSampleBuffer, NSError *error) {
+        
+        if (error) {
+            dispatch_semaphore_signal(frameRenderingSemaphore);
+            block(nil, error);
+            return;
+        }
+        NSData *jpegData = [AVCaptureStillImageOutput jpegStillImageNSDataRepresentation:imageSampleBuffer];
+        
+        dispatch_semaphore_signal(frameRenderingSemaphore);
+        block(jpegData , nil);
+    }];
+}
 
 - (void)capturePhotoAsSampleBufferWithCompletionHandler:(void (^)(CMSampleBufferRef imageSampleBuffer, NSError *error))block
 {

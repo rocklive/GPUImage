@@ -7,12 +7,18 @@ void GPUImageCreateResizedSampleBuffer(CVPixelBufferRef cameraFrame, CGSize fina
 
 /** The JPEG compression quality to use when capturing a photo as a JPEG.
  */
+
+- (id)initWithSessionPreset:(NSString *)sessionPreset
+             cameraPosition:(AVCaptureDevicePosition)cameraPosition
+        photoOutputSettings:(NSDictionary *)photoSettings;
+
 @property CGFloat jpegCompressionQuality;
 
 // Only reliably set inside the context of the completion handler of one of the capture methods
 @property (readonly) NSDictionary *currentCaptureMetadata;
 
 // Photography controls
+- (void)capturePhotoAsJpegData:(void (^)(NSData* jpegData, NSError *error))block;
 - (void)capturePhotoAsSampleBufferWithCompletionHandler:(void (^)(CMSampleBufferRef imageSampleBuffer, NSError *error))block;
 - (void)capturePhotoAsImageProcessedUpToFilter:(GPUImageOutput<GPUImageInput> *)finalFilterInChain withCompletionHandler:(void (^)(UIImage *processedImage, NSError *error))block;
 - (void)capturePhotoAsImageProcessedUpToFilter:(GPUImageOutput<GPUImageInput> *)finalFilterInChain withOrientation:(UIImageOrientation)orientation withCompletionHandler:(void (^)(UIImage *processedImage, NSError *error))block;
