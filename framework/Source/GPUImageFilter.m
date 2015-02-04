@@ -557,6 +557,12 @@ NSString *const kGPUImagePassthroughFragmentShaderString = SHADER_STRING
 
 - (void)newFrameReadyAtTime:(CMTime)frameTime atIndex:(NSInteger)textureIndex;
 {
+    
+    CGSize currentFBOSize = [self sizeOfFBO];
+    if (currentFBOSize.width == 0 || currentFBOSize.height == 0) {
+        return;
+    }
+    
     static const GLfloat imageVertices[] = {
         -1.0f, -1.0f,
         1.0f, -1.0f,
