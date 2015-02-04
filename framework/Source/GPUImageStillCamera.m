@@ -176,9 +176,11 @@ void GPUImageCreateResizedSampleBuffer(CVPixelBufferRef cameraFrame, CGSize fina
 #pragma mark -
 #pragma mark Photography controls
 
-- (void)capturePhotoAsJpegData:(void (^)(NSData* jpegData, NSError *error))block
+- (void)capturePhotoAsJpegDataWithPauseProcessing:(BOOL)pauseProcessing completion:(void (^)(NSData* jpegData, NSError *error))block
 {
-    dispatch_semaphore_wait(frameRenderingSemaphore, DISPATCH_TIME_FOREVER);
+    if (pauseProcessing) {
+        dispatch_semaphore_wait(frameRenderingSemaphore, DISPATCH_TIME_FOREVER);
+    }
     
     AVCaptureConnection *connection = [[photoOutput connections] objectAtIndex:0];
     
@@ -190,8 +192,9 @@ void GPUImageCreateResizedSampleBuffer(CVPixelBufferRef cameraFrame, CGSize fina
             return;
         }
         NSData *jpegData = [AVCaptureStillImageOutput jpegStillImageNSDataRepresentation:imageSampleBuffer];
-        
-        dispatch_semaphore_signal(frameRenderingSemaphore);
+        if (pauseProcessing) {
+            dispatch_semaphore_signal(frameRenderingSemaphore);
+        }
         block(jpegData , nil);
     }];
 }
