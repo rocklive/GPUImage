@@ -844,9 +844,19 @@ NSString *const kGPUImageColorSwizzlingFragmentShaderString = SHADER_STRING
                                    nil];*/
         }
         
-        assetWriterAudioInput = [AVAssetWriterInput assetWriterInputWithMediaType:AVMediaTypeAudio outputSettings:audioOutputSettings];
+        CMFormatDescriptionRef audioDesc = NULL;
+        if (audioOutputSettings == nil) {
+            CMFormatDescriptionCreate(kCFAllocatorDefault, kCMMediaType_Audio, kAudioFormatMPEG4AAC, NULL, &audioDesc);
+        }
+        
+        assetWriterAudioInput = [AVAssetWriterInput assetWriterInputWithMediaType:AVMediaTypeAudio outputSettings:audioOutputSettings sourceFormatHint:audioDesc];
         [assetWriter addInput:assetWriterAudioInput];
         assetWriterAudioInput.expectsMediaDataInRealTime = _encodingLiveVideo;
+        
+        if (audioDesc != NULL) {
+            CFRelease(audioDesc);
+        }
+
     }
     else
     {
