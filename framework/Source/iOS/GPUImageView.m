@@ -130,6 +130,15 @@
     });
 }
 
+// Workaround for SHOTSIOS-2231
+- (void)recreateFrameBuffer {
+    runSynchronouslyOnVideoProcessingQueue(^{
+        [self destroyDisplayFramebuffer];
+        [self createDisplayFramebuffer];
+        [self recalculateViewGeometry];
+    });
+}
+
 - (void)layoutSubviews {
     [super layoutSubviews];
     
