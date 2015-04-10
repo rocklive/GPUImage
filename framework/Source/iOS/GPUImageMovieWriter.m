@@ -880,7 +880,13 @@ NSString *const kGPUImageColorSwizzlingFragmentShaderString = SHADER_STRING
         
         CMFormatDescriptionRef audioDesc = NULL;
         if (audioOutputSettings == nil) {
-            CMFormatDescriptionCreate(kCFAllocatorDefault, kCMMediaType_Audio, kAudioFormatMPEG4AAC, NULL, &audioDesc);
+            AudioStreamBasicDescription asbd = {0};
+            asbd.mSampleRate = [[AVAudioSession sharedInstance] sampleRate];
+            asbd.mFormatID   = kAudioFormatMPEG4AAC;
+            OSStatus res = CMAudioFormatDescriptionCreate(kCFAllocatorDefault, &asbd, NULL, NULL, NULL, NULL, NULL, &audioDesc);
+            if (res != 0) {
+                NSLog(@"%s can't setup audio track. Status %li", __func__, res);
+            }
         }
         
         assetWriterAudioInput = [AVAssetWriterInput assetWriterInputWithMediaType:AVMediaTypeAudio outputSettings:audioOutputSettings sourceFormatHint:audioDesc];

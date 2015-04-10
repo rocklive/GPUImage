@@ -216,7 +216,13 @@
         
         // This might need to be extended to handle movies with more than one audio track
         AVAssetTrack* audioTrack = [audioTracks objectAtIndex:0];
-        readerAudioTrackOutput = [AVAssetReaderTrackOutput assetReaderTrackOutputWithTrack:audioTrack outputSettings:nil];
+        
+        NSDictionary *outputSettings = @{
+                                         AVFormatIDKey : [NSNumber numberWithInt:kAudioFormatLinearPCM],
+                                         AVSampleRateKey : [NSNumber numberWithFloat:[[AVAudioSession sharedInstance] sampleRate]]
+                                         };
+
+        readerAudioTrackOutput = [AVAssetReaderTrackOutput assetReaderTrackOutputWithTrack:audioTrack outputSettings:outputSettings];
         readerAudioTrackOutput.alwaysCopiesSampleData = NO;
         [assetReader addOutput:readerAudioTrackOutput];
     }
