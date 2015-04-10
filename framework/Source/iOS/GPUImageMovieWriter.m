@@ -28,6 +28,7 @@ NSString *const kGPUImageColorSwizzlingFragmentShaderString = SHADER_STRING
     GPUImageFramebuffer *firstInputFramebuffer;
     
     CMTime startTime, previousFrameTime, previousAudioTime;
+    CMTime startVideoTime;
 
     dispatch_queue_t audioQueue, videoQueue;
     BOOL audioEncodingIsFinished, videoEncodingIsFinished;
@@ -78,6 +79,8 @@ NSString *const kGPUImageColorSwizzlingFragmentShaderString = SHADER_STRING
 		return nil;
     }
 
+    startVideoTime = kCMTimePositiveInfinity;
+    
     _shouldInvalidateAudioSampleWhenDone = NO;
     
     self.enabled = YES;
@@ -437,6 +440,14 @@ NSString *const kGPUImageColorSwizzlingFragmentShaderString = SHADER_STRING
             CFRelease(audioBuffer);
         };
 //        runAsynchronouslyOnContextQueue(_movieWriterContext, write);
+        
+        CMTime timeStamp = CMSampleBufferGetPresentationTimeStamp(audioBuffer);
+        if (CMTIME_COMPARE_INLINE(timeStamp, <, startVideoTime)) {
+            NSLog(@"Will drop audio sample due to video processing hasn't started");
+            CFRelease(audioBuffer);
+            return;
+        }
+        
         if( _encodingLiveVideo )
 
         {
@@ -487,7 +498,9 @@ NSString *const kGPUImageColorSwizzlingFragmentShaderString = SHADER_STRING
     if (audioInputReadyCallback != NULL)
     {
         audioQueue = dispatch_queue_create("com.sunsetlakesoftware.GPUImage.audioReadingQueue", NULL);
-        [assetWriterAudioInput requestMediaDataWhenReadyOnQueue:audioQueue usingBlock:^{
+        //we use video queue because processAudioBuffer: will drop all audio frames before we get
+        //first video frame timestamp
+        [assetWriterAudioInput requestMediaDataWhenReadyOnQueue:videoQueue usingBlock:^{
             if( _paused )
             {
                 //NSLog(@"audio requestMediaDataWhenReadyOnQueue paused");
@@ -742,6 +755,10 @@ NSString *const kGPUImageColorSwizzlingFragmentShaderString = SHADER_STRING
             CVPixelBufferUnlockBaseAddress(pixel_buffer, 0);
             
             previousFrameTime = frameTime;
+            
+            if (CMTimeCompare(startVideoTime, frameTime) == 1) {
+                startVideoTime = frameTime;
+            }
             
             if (![GPUImageContext supportsFastTextureUpload])
             {
