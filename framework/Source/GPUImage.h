@@ -20,6 +20,9 @@
 #import "GPUImageFramebuffer.h"
 #import "GPUImageFramebufferCache.h"
 
+// Categories
+#import "AVasset+GPUImage.h"
+
 // Filters
 #import "GPUImageFilter.h"
 #import "GPUImageTwoInputFilter.h"

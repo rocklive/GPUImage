@@ -2,6 +2,7 @@
 #import "GPUImageMovieWriter.h"
 #import "GPUImageFilter.h"
 #import "GPUImageVideoCamera.h"
+#import "AVAsset+GPUImage.h"
 
 @interface GPUImageMovie () <AVPlayerItemOutputPullDelegate>
 {
@@ -210,21 +211,24 @@
 
     NSArray *audioTracks = [self.asset tracksWithMediaType:AVMediaTypeAudio];
     BOOL shouldRecordAudioTrack = (([audioTracks count] > 0) && (self.audioEncodingTarget != nil) );
-    AVAssetReaderTrackOutput *readerAudioTrackOutput = nil;
+    AVAssetReaderAudioMixOutput *readerAudioTrackOutput = nil;
 
     if (shouldRecordAudioTrack)
     {
         [self.audioEncodingTarget setShouldInvalidateAudioSampleWhenDone:YES];
-        
-        // This might need to be extended to handle movies with more than one audio track
-        AVAssetTrack* audioTrack = [audioTracks objectAtIndex:0];
         
         NSDictionary *outputSettings = @{
                                          AVFormatIDKey : [NSNumber numberWithInt:kAudioFormatLinearPCM],
                                          AVSampleRateKey : [NSNumber numberWithFloat:[[AVAudioSession sharedInstance] sampleRate]]
                                          };
 
-        readerAudioTrackOutput = [AVAssetReaderTrackOutput assetReaderTrackOutputWithTrack:audioTrack outputSettings:outputSettings];
+        readerAudioTrackOutput = [AVAssetReaderAudioMixOutput
+                                  assetReaderAudioMixOutputWithAudioTracks:audioTracks
+                                                             audioSettings:outputSettings];
+        
+        if ([self.asset gpu_associatedAudioMix] != nil)
+            readerAudioTrackOutput.audioMix = [self.asset gpu_associatedAudioMix];
+
         readerAudioTrackOutput.alwaysCopiesSampleData = NO;
         [assetReader addOutput:readerAudioTrackOutput];
     }

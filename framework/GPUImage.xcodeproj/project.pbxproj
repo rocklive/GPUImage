@@ -23,6 +23,10 @@
 /* Begin PBXBuildFile section */
 		0DF3FA2B14FA00C9006AF7D9 /* GPUImageVignetteFilter.h in Headers */ = {isa = PBXBuildFile; fileRef = 0DF3FA2914FA00C9006AF7D9 /* GPUImageVignetteFilter.h */; };
 		0DF3FA2C14FA00C9006AF7D9 /* GPUImageVignetteFilter.m in Sources */ = {isa = PBXBuildFile; fileRef = 0DF3FA2A14FA00C9006AF7D9 /* GPUImageVignetteFilter.m */; };
+		14C7661B1B0B0E72007260CE /* AVAsset+GPUImage.h in Headers */ = {isa = PBXBuildFile; fileRef = 14C766191B0B0E72007260CE /* AVAsset+GPUImage.h */; };
+		14C7661C1B0B0E72007260CE /* AVAsset+GPUImage.h in Headers */ = {isa = PBXBuildFile; fileRef = 14C766191B0B0E72007260CE /* AVAsset+GPUImage.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		14C7661D1B0B0E72007260CE /* AVAsset+GPUImage.m in Sources */ = {isa = PBXBuildFile; fileRef = 14C7661A1B0B0E72007260CE /* AVAsset+GPUImage.m */; };
+		14C7661E1B0B0E72007260CE /* AVAsset+GPUImage.m in Sources */ = {isa = PBXBuildFile; fileRef = 14C7661A1B0B0E72007260CE /* AVAsset+GPUImage.m */; };
 		4308B1D715F7EED30014437A /* GPUImageNormalBlendFilter.h in Headers */ = {isa = PBXBuildFile; fileRef = 4308B1D515F7EED10014437A /* GPUImageNormalBlendFilter.h */; };
 		4308B1D815F7EED30014437A /* GPUImageNormalBlendFilter.m in Sources */ = {isa = PBXBuildFile; fileRef = 4308B1D615F7EED20014437A /* GPUImageNormalBlendFilter.m */; };
 		4686952F155AACAC0060BA43 /* GPUImageSourceOverBlendFilter.h in Headers */ = {isa = PBXBuildFile; fileRef = 4686952D155AACAC0060BA43 /* GPUImageSourceOverBlendFilter.h */; };
@@ -701,6 +705,8 @@
 		0D9D91AE15011CA200A5BC83 /* GPUImageGaussianSelectiveBlurFilter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = GPUImageGaussianSelectiveBlurFilter.m; path = Source/GPUImageGaussianSelectiveBlurFilter.m; sourceTree = SOURCE_ROOT; };
 		0DF3FA2914FA00C9006AF7D9 /* GPUImageVignetteFilter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GPUImageVignetteFilter.h; path = Source/GPUImageVignetteFilter.h; sourceTree = SOURCE_ROOT; };
 		0DF3FA2A14FA00C9006AF7D9 /* GPUImageVignetteFilter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = GPUImageVignetteFilter.m; path = Source/GPUImageVignetteFilter.m; sourceTree = SOURCE_ROOT; };
+		14C766191B0B0E72007260CE /* AVAsset+GPUImage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "AVAsset+GPUImage.h"; path = "Source/AVAsset+GPUImage.h"; sourceTree = SOURCE_ROOT; };
+		14C7661A1B0B0E72007260CE /* AVAsset+GPUImage.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "AVAsset+GPUImage.m"; path = "Source/AVAsset+GPUImage.m"; sourceTree = SOURCE_ROOT; };
 		4308B1D515F7EED10014437A /* GPUImageNormalBlendFilter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GPUImageNormalBlendFilter.h; path = Source/GPUImageNormalBlendFilter.h; sourceTree = SOURCE_ROOT; };
 		4308B1D615F7EED20014437A /* GPUImageNormalBlendFilter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = GPUImageNormalBlendFilter.m; path = Source/GPUImageNormalBlendFilter.m; sourceTree = SOURCE_ROOT; };
 		4686952D155AACAC0060BA43 /* GPUImageSourceOverBlendFilter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GPUImageSourceOverBlendFilter.h; path = Source/GPUImageSourceOverBlendFilter.h; sourceTree = SOURCE_ROOT; };
@@ -1494,6 +1500,8 @@
 				BCC887CB18A1CEEB008DB37D /* GPUImageFramebuffer.m */,
 				BCC887CE18A1D3AD008DB37D /* GPUImageFramebufferCache.h */,
 				BCC887CF18A1D3AD008DB37D /* GPUImageFramebufferCache.m */,
+				14C766191B0B0E72007260CE /* AVAsset+GPUImage.h */,
+				14C7661A1B0B0E72007260CE /* AVAsset+GPUImage.m */,
 				BCB5E78114E232BC00701302 /* Sources */,
 				0D6948871501F56600206FF8 /* Pipeline */,
 				BC245DC314DDBE6B009FE7EB /* Filters */,
@@ -1633,6 +1641,7 @@
 				BCD81EF8194404F0007133DB /* GPUImageDarkenBlendFilter.h in Headers */,
 				BCD81EF9194404F0007133DB /* GPUImageDifferenceBlendFilter.h in Headers */,
 				BCD81EFA194404F0007133DB /* GPUImageDissolveBlendFilter.h in Headers */,
+				14C7661C1B0B0E72007260CE /* AVAsset+GPUImage.h in Headers */,
 				BCD81EFB194404F1007133DB /* GPUImageExclusionBlendFilter.h in Headers */,
 				BCD81EFC194404F1007133DB /* GPUImageHardLightBlendFilter.h in Headers */,
 				BCD81EFD194404F1007133DB /* GPUImageSoftLightBlendFilter.h in Headers */,
@@ -1703,6 +1712,7 @@
 				BCB5DE0D14E87F32000AF3C2 /* GPUImagePixellateFilter.h in Headers */,
 				BC982B5314F07F790001FF6F /* GPUImageColorInvertFilter.h in Headers */,
 				BC982B5514F07F790001FF6F /* GPUImageSaturationFilter.h in Headers */,
+				14C7661B1B0B0E72007260CE /* AVAsset+GPUImage.h in Headers */,
 				BC982B6714F092EF0001FF6F /* GPUImageContrastFilter.h in Headers */,
 				BC982B7914F098CC0001FF6F /* GPUImageBrightnessFilter.h in Headers */,
 				BC982B7E14F09F980001FF6F /* GPUImageGammaFilter.h in Headers */,
@@ -1987,6 +1997,7 @@
 				BCD81F4319440604007133DB /* GPUImageBuffer.m in Sources */,
 				BCD81F4419440604007133DB /* GPUImageBrightnessFilter.m in Sources */,
 				BCD81F4519440604007133DB /* GPUImageLevelsFilter.m in Sources */,
+				14C7661E1B0B0E72007260CE /* AVAsset+GPUImage.m in Sources */,
 				BCD81F4619440604007133DB /* GPUImageExposureFilter.m in Sources */,
 				BCD81F4719440604007133DB /* GPUImageContrastFilter.m in Sources */,
 				BCD81F4819440604007133DB /* GPUImageSaturationFilter.m in Sources */,
@@ -2263,6 +2274,7 @@
 				BCB79E1115EBE1A700965D92 /* GPUImageSolidColorGenerator.m in Sources */,
 				BCB79E6015EC131A00965D92 /* GPUImageLuminosity.m in Sources */,
 				BCB79E7B15EC2A8400965D92 /* GPUImageAverageLuminanceThresholdFilter.m in Sources */,
+				14C7661D1B0B0E72007260CE /* AVAsset+GPUImage.m in Sources */,
 				BC99234F15EFFC8700ED2C8C /* GPUImageChromaKeyFilter.m in Sources */,
 				BC99235415EFFC9700ED2C8C /* GPUImageWhiteBalanceFilter.m in Sources */,
 				BCB3B46615F2BA9300EDA3BE /* GPUImageLowPassFilter.m in Sources */,
