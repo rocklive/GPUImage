@@ -2,7 +2,7 @@
 
 @class GPUImageGrayscaleFilter;
 @class GPUImageSingleComponentGaussianBlurFilter;
-@class GPUImageDirectionalSobelEdgeDetectionFilter;
+@class GPUimageDirectionalSobelEdgeDetectionFilter;
 @class GPUImageDirectionalNonMaximumSuppressionFilter;
 @class GPUImageWeakPixelInclusionFilter;
 
@@ -23,7 +23,7 @@
 {
     GPUImageGrayscaleFilter *luminanceFilter;
     GPUImageSingleComponentGaussianBlurFilter *blurFilter;
-    GPUImageDirectionalSobelEdgeDetectionFilter *edgeDetectionFilter;
+    GPUimageDirectionalSobelEdgeDetectionFilter *edgeDetectionFilter;
     GPUImageDirectionalNonMaximumSuppressionFilter *nonMaximumSuppressionFilter;
     GPUImageWeakPixelInclusionFilter *weakPixelInclusionFilter;
 }

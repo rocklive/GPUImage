@@ -9,8 +9,6 @@ NSString *const kGPUImageLookupFragmentShaderString = SHADER_STRING
  uniform sampler2D inputImageTexture;
  uniform sampler2D inputImageTexture2; // lookup texture
  
- uniform lowp float intensity;
-
  void main()
  {
      highp vec4 textureColor = texture2D(inputImageTexture, textureCoordinate);
@@ -37,7 +35,7 @@ NSString *const kGPUImageLookupFragmentShaderString = SHADER_STRING
      lowp vec4 newColor2 = texture2D(inputImageTexture2, texPos2);
      
      lowp vec4 newColor = mix(newColor1, newColor2, fract(blueColor));
-     gl_FragColor = mix(textureColor, vec4(newColor.rgb, textureColor.w), intensity);
+     gl_FragColor = vec4(newColor.rgb, textureColor.w);
  }
 );
 #else
@@ -48,8 +46,6 @@ NSString *const kGPUImageLookupFragmentShaderString = SHADER_STRING
  
  uniform sampler2D inputImageTexture;
  uniform sampler2D inputImageTexture2; // lookup texture
- 
- uniform float intensity;
  
  void main()
  {
@@ -77,39 +73,21 @@ NSString *const kGPUImageLookupFragmentShaderString = SHADER_STRING
      vec4 newColor2 = texture2D(inputImageTexture2, texPos2);
      
      vec4 newColor = mix(newColor1, newColor2, fract(blueColor));
-     gl_FragColor = mix(textureColor, vec4(newColor.rgb, textureColor.w), intensity);
+     gl_FragColor = vec4(newColor.rgb, textureColor.w);
  }
 );
 #endif
 
 @implementation GPUImageLookupFilter
 
-@synthesize intensity = _intensity;
-
-#pragma mark -
-#pragma mark Initialization and teardown
-
 - (id)init;
 {
-    intensityUniform = [filterProgram uniformIndex:@"intensity"];
-    self.intensity = 1.0f;
-    
     if (!(self = [super initWithFragmentShaderFromString:kGPUImageLookupFragmentShaderString]))
     {
 		return nil;
     }
     
     return self;
-}
-
-#pragma mark -
-#pragma mark Accessors
-
-- (void)setIntensity:(CGFloat)intensity
-{
-    _intensity = intensity;
-    
-    [self setFloat:_intensity forUniform:intensityUniform program:filterProgram];
 }
 
 @end

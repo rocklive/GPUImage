@@ -259,12 +259,7 @@ static void *openGLESContextQueueKey;
 #if TARGET_IPHONE_SIMULATOR
     return NO;
 #else
-    
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wtautological-pointer-compare"
     return (CVOpenGLESTextureCacheCreate != NULL);
-#pragma clang diagnostic pop
-
 #endif
 }
 

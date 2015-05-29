@@ -149,9 +149,6 @@
 #import <GPUImage/GPUImageLocalBinaryPatternFilter.h>
 #import <GPUImage/GPUImageMosaicFilter.h>
 #import <GPUImage/GPUImagePerlinNoiseFilter.h>
-#import <GPUImage/GPUImageWeakPixelInclusionFilter.h>
-#import <GPUImage/GPUImageNonMaximumSuppressionFilter.h>
-#import <GPUImage/GPUImageSourceOverBlendFilter.h>
 
 // Outputs
 #import <GPUImage/GPUImageView.h>

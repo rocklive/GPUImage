@@ -49,14 +49,6 @@
 	[super viewWillDisappear:animated];
 }
 
-- (void)viewDidAppear:(BOOL)animated
-{
-    [super viewDidAppear:animated];
-    
-    // Note: I needed to start camera capture after the view went on the screen, when a partially transition of navigation view controller stopped capturing via viewWilDisappear.
-    [videoCamera startCameraCapture];
-}
-
 - (void)viewDidUnload
 {
     [super viewDidUnload];
