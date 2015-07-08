@@ -310,7 +310,7 @@ NSString *const kGPUImageColorSwizzlingFragmentShaderString = SHADER_STRING
     runSynchronouslyOnContextQueue(_movieWriterContext, ^{
         isRecording = NO;
         
-        if (assetWriter.status == AVAssetWriterStatusCompleted || assetWriter.status == AVAssetWriterStatusCancelled || assetWriter.status == AVAssetWriterStatusUnknown)
+        if (assetWriter.status != AVAssetWriterStatusWriting)
         {
             if (handler)
                 runAsynchronouslyOnContextQueue(_movieWriterContext, handler);
@@ -514,12 +514,17 @@ NSString *const kGPUImageColorSwizzlingFragmentShaderString = SHADER_STRING
                 if( audioInputReadyCallback && ! audioInputReadyCallback() && ! audioEncodingIsFinished )
                 {
                     runAsynchronouslyOnContextQueue(_movieWriterContext, ^{
-                        if( assetWriter.status == AVAssetWriterStatusWriting && ! audioEncodingIsFinished )
+                        BOOL shouldFinish = assetWriter.status == AVAssetWriterStatusWriting ||
+                                            assetWriter.status == AVAssetWriterStatusFailed;
+                        if( shouldFinish && ! audioEncodingIsFinished )
                         {
                             audioEncodingIsFinished = YES;
                             [assetWriterAudioInput markAsFinished];
                         }
                     });
+                    
+                    if (assetWriter.status == AVAssetWriterStatusFailed)
+                        break;
                 }
             }
             //NSLog(@"audio requestMediaDataWhenReadyOnQueue end");
