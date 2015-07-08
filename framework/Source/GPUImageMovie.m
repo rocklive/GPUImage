@@ -154,6 +154,10 @@
 
 - (void)startProcessing
 {
+    if ([[UIApplication sharedApplication] applicationState] != UIApplicationStateActive) {
+        return;
+    }
+    
     if( self.playerItem ) {
         [self processPlayerItem];
         return;
