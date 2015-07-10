@@ -367,6 +367,11 @@ NSString *const kGPUImageColorSwizzlingFragmentShaderString = SHADER_STRING
 
         CMTime currentSampleTime = CMSampleBufferGetOutputPresentationTimeStamp(audioBuffer);
         
+        if (CMTIME_IS_VALID(frameTimeOffset)) {
+            currentSampleTime = CMTimeSubtract(currentSampleTime, frameTimeOffset);
+        }
+        CMSampleBufferSetOutputPresentationTimeStamp(audioBuffer, currentSampleTime);
+
         if (CMTIME_IS_INVALID(startTime))
         {
             runSynchronouslyOnContextQueue(_movieWriterContext, ^{
