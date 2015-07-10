@@ -29,6 +29,8 @@ NSString *const kGPUImageColorSwizzlingFragmentShaderString = SHADER_STRING
     
     CMTime startTime, previousFrameTime, previousAudioTime;
     CMTime startVideoTime;
+    
+    CMTime frameTimeOffset;
 
     dispatch_queue_t audioQueue, videoQueue;
     BOOL audioEncodingIsFinished, videoEncodingIsFinished;
@@ -80,6 +82,7 @@ NSString *const kGPUImageColorSwizzlingFragmentShaderString = SHADER_STRING
     }
 
     startVideoTime = kCMTimePositiveInfinity;
+    frameTimeOffset = kCMTimeInvalid;
     
     _shouldInvalidateAudioSampleWhenDone = NO;
     
@@ -749,14 +752,17 @@ NSString *const kGPUImageColorSwizzlingFragmentShaderString = SHADER_STRING
             }
             else if(self.assetWriter.status == AVAssetWriterStatusWriting)
             {
-                if (CMTIME_COMPARE_INLINE(frameTime, ==, kCMTimeZero)) {
-                    
-                    NSLog(@"skipping pixel buffer with presentation time %@", CFBridgingRelease(CMTimeCopyDescription(kCFAllocatorDefault, frameTime)));
-                    
-                } else {
-                    if (![assetWriterPixelBufferInput appendPixelBuffer:pixel_buffer withPresentationTime:frameTime])
-                        NSLog(@"Problem appending pixel buffer at time: %@", CFBridgingRelease(CMTimeCopyDescription(kCFAllocatorDefault, frameTime)));
+                CMTime appendTime = frameTime;
+                if (CMTIME_IS_INVALID(frameTimeOffset)) {
+                    frameTimeOffset = CMTimeSubtract(frameTime, startTime);
                 }
+                
+                if (CMTIME_IS_NUMERIC(frameTimeOffset)) {
+                    appendTime = CMTimeSubtract(frameTime, frameTimeOffset);
+                }
+                
+                if (![assetWriterPixelBufferInput appendPixelBuffer:pixel_buffer withPresentationTime:appendTime])
+                    NSLog(@"Problem appending pixel buffer at time: %@", CFBridgingRelease(CMTimeCopyDescription(kCFAllocatorDefault, frameTime)));
             }
             else
             {
