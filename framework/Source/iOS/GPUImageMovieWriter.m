@@ -924,7 +924,7 @@ NSString *const kGPUImageColorSwizzlingFragmentShaderString = SHADER_STRING
             asbd.mFormatID   = kAudioFormatMPEG4AAC;
             OSStatus res = CMAudioFormatDescriptionCreate(kCFAllocatorDefault, &asbd, 0, NULL, 0, NULL, NULL, &audioDesc);
             if (res != 0) {
-                NSLog(@"%s can't setup audio track. Status %li", __func__, res);
+                NSLog(@"%s can't setup audio track. Status %i", __func__, (int)res);
             }
         }
         

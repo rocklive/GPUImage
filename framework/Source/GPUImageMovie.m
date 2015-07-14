@@ -258,20 +258,22 @@
 
     if ([reader startReading] == NO) 
     {
-            NSLog(@"Error reading from file at URL: %@", self.url);
+        NSLog(@"Error reading from file at URL: %@", self.url);
         return;
     }
 
-    __unsafe_unretained GPUImageMovie *weakSelf = self;
-
     if (synchronizedMovieWriter != nil)
     {
+        __weak typeof(self) weakSelf = self;
+
         [synchronizedMovieWriter setVideoInputReadyCallback:^{
-            return [weakSelf readNextVideoFrameFromOutput:readerVideoTrackOutput];
+            __strong typeof(weakSelf) strongSelf = weakSelf;
+            return [strongSelf readNextVideoFrameFromOutput:readerVideoTrackOutput];
         }];
 
         [synchronizedMovieWriter setAudioInputReadyCallback:^{
-            return [weakSelf readNextAudioSampleFromOutput:readerAudioTrackOutput];
+            __strong typeof(weakSelf) strongSelf = weakSelf;
+            return [strongSelf readNextAudioSampleFromOutput:readerAudioTrackOutput];
         }];
 
         [synchronizedMovieWriter enableSynchronizationCallbacks];
@@ -280,13 +282,12 @@
     {
         while (reader.status == AVAssetReaderStatusReading && (!_shouldRepeat || keepLooping))
         {
-                [weakSelf readNextVideoFrameFromOutput:readerVideoTrackOutput];
+                [self readNextVideoFrameFromOutput:readerVideoTrackOutput];
 
             if ( (readerAudioTrackOutput) && (!audioEncodingIsFinished) )
             {
-                    [weakSelf readNextAudioSampleFromOutput:readerAudioTrackOutput];
+                [self readNextAudioSampleFromOutput:readerAudioTrackOutput];
             }
-
         }
 
         if (reader.status == AVAssetReaderStatusCompleted) {
@@ -299,9 +300,8 @@
                     [self startProcessing];
                 });
             } else {
-                [weakSelf endProcessing];
+                [self endProcessing];
             }
-
         }
     }
 }
@@ -348,13 +348,14 @@
 	CMTime outputItemTime = [playerItemOutput itemTimeForHostTime:nextVSync];
 
 	if ([playerItemOutput hasNewPixelBufferForItemTime:outputItemTime]) {
-        __unsafe_unretained GPUImageMovie *weakSelf = self;
 		CVPixelBufferRef pixelBuffer = [playerItemOutput copyPixelBufferForItemTime:outputItemTime itemTimeForDisplay:NULL];
-        if( pixelBuffer )
+        if( pixelBuffer ){
+            __weak typeof(self) weakSelf = self;
             runSynchronouslyOnVideoProcessingQueue(^{
                 [weakSelf processMovieFrame:pixelBuffer withSampleTime:outputItemTime];
                 CFRelease(pixelBuffer);
             });
+        }
 	}
 }
 
@@ -385,7 +386,7 @@
                 previousActualFrameTime = CFAbsoluteTimeGetCurrent();
             }
 
-            __unsafe_unretained GPUImageMovie *weakSelf = self;
+            __weak typeof(self) weakSelf = self;
             runSynchronouslyOnVideoProcessingQueue(^{
                 [weakSelf processMovieFrame:sampleBufferRef];
                 CMSampleBufferInvalidate(sampleBufferRef);
