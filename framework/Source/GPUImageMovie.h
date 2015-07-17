@@ -58,4 +58,5 @@
 - (void)cancelProcessing;
 - (void)processMovieFrame:(CMSampleBufferRef)movieSampleBuffer; 
 
+- (void)rl_cancelProcessing;
 @end

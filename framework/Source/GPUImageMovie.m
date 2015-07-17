@@ -28,6 +28,8 @@
     int imageBufferWidth, imageBufferHeight;
 }
 
+@property (assign, nonatomic) BOOL cancelledProcessing;
+
 - (void)processAsset;
 
 @end
@@ -154,7 +156,8 @@
 
 - (void)startProcessing
 {
-    if ([[UIApplication sharedApplication] applicationState] != UIApplicationStateActive) {
+    if (_cancelledProcessing) {
+        [self cancelProcessing];
         return;
     }
     
@@ -268,14 +271,25 @@
 
         [synchronizedMovieWriter setVideoInputReadyCallback:^{
             __strong typeof(weakSelf) strongSelf = weakSelf;
+            if (weakSelf.cancelledProcessing) {
+                [weakSelf cancelProcessing];
+                return NO;
+            }
             return [strongSelf readNextVideoFrameFromOutput:readerVideoTrackOutput];
         }];
 
         [synchronizedMovieWriter setAudioInputReadyCallback:^{
+            if (weakSelf.cancelledProcessing) {
+                [weakSelf cancelProcessing];
+                return NO;
+            }
             __strong typeof(weakSelf) strongSelf = weakSelf;
             return [strongSelf readNextAudioSampleFromOutput:readerAudioTrackOutput];
         }];
-
+        if (_cancelledProcessing) {
+            [self cancelProcessing];
+            return;
+        }
         [synchronizedMovieWriter enableSynchronizationCallbacks];
     }
     else
@@ -718,6 +732,10 @@
         [reader cancelReading];
     }
     [self endProcessing];
+}
+
+- (void)rl_cancelProcessing{
+    _cancelledProcessing = YES;
 }
 
 - (void)convertYUVToRGBOutput;
