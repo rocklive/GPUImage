@@ -2,6 +2,8 @@
 #import "GPUImageMovieWriter.h"
 #import "GPUImageFilter.h"
 
+static const CGFloat kMaxZoomFactor = 5.0;
+
 // Color Conversion Constants (YUV to RGB) including adjustment from 16-235/16-240 (video range)
 
 // BT.601, which is the standard for SDTV.
@@ -161,6 +163,7 @@ NSString *const kGPUImageYUVVideoRangeConversionForLAFragmentShaderString = SHAD
     internalRotation = kGPUImageNoRotation;
     captureAsYUV = YES;
     _preferredConversion = kColorConversion709;
+    _zoomFactor = 1.0;
     
 	// Grab the back-facing or front-facing camera
     _inputCamera = nil;
@@ -480,6 +483,8 @@ NSString *const kGPUImageYUVVideoRangeConversionForLAFragmentShaderString = SHAD
     
     _inputCamera = backFacingCamera;
     [self setOutputImageOrientation:_outputImageOrientation];
+    
+    _zoomFactor = 1.0;
 }
 
 - (AVCaptureDevicePosition)cameraPosition 
@@ -1126,6 +1131,30 @@ NSString *const kGPUImageYUVVideoRangeConversionForLAFragmentShaderString = SHAD
 {
     _horizontallyMirrorRearFacingCamera = newValue;
     [self updateOrientationSendToTargets];
+}
+
+- (void)setZoomFactor:(CGFloat)zoomFactor {
+    if (zoomFactor < 1.0)
+        return;
+    
+    NSError *error = nil;
+    [_inputCamera lockForConfiguration:&error];
+    if (zoomFactor < _inputCamera.activeFormat.videoMaxZoomFactor) {
+        if (zoomFactor > kMaxZoomFactor)
+            zoomFactor = kMaxZoomFactor;
+        
+        _inputCamera.videoZoomFactor = zoomFactor;
+        _zoomFactor = zoomFactor;
+    }
+    [_inputCamera unlockForConfiguration];
+    
+    if (error != nil) {
+        NSLog(@"Can't apply zoom factor %f for %@. Error %@", zoomFactor, self, error);
+    }
+}
+
+- (CGFloat)maxZoomFactor {
+    return MIN(_inputCamera.activeFormat.videoMaxZoomFactor, kMaxZoomFactor);
 }
 
 @end

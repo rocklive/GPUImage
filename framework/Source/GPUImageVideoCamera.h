@@ -74,6 +74,9 @@ extern NSString *const kGPUImageYUVVideoRangeConversionForLAFragmentShaderString
 
 @property(nonatomic, weak) id<GPUImageVideoCameraDelegate> delegate;
 
+@property (assign, nonatomic) CGFloat zoomFactor;
+@property (readonly, assign, nonatomic) CGFloat maxZoomFactor;
+
 /// @name Initialization and teardown
 
 /** Begin a capture session
