@@ -74,8 +74,10 @@ extern NSString *const kGPUImageYUVVideoRangeConversionForLAFragmentShaderString
 
 @property(nonatomic, weak) id<GPUImageVideoCameraDelegate> delegate;
 
-@property (assign, nonatomic) CGFloat zoomFactor;
+@property (readonly, nonatomic) CGFloat zoomFactor;
 @property (readonly, assign, nonatomic) CGFloat maxZoomFactor;
+@property (assign, nonatomic) CGFloat smoothZoomRate;
+- (void)setZoomFactor:(CGFloat)zoomFactor smooth:(BOOL)isSmooth;
 
 /// @name Initialization and teardown
 

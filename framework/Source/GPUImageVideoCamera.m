@@ -164,6 +164,7 @@ NSString *const kGPUImageYUVVideoRangeConversionForLAFragmentShaderString = SHAD
     captureAsYUV = YES;
     _preferredConversion = kColorConversion709;
     _zoomFactor = 1.0;
+    self.smoothZoomRate = 2.0;
     
 	// Grab the back-facing or front-facing camera
     _inputCamera = nil;
@@ -1133,7 +1134,7 @@ NSString *const kGPUImageYUVVideoRangeConversionForLAFragmentShaderString = SHAD
     [self updateOrientationSendToTargets];
 }
 
-- (void)setZoomFactor:(CGFloat)zoomFactor {
+- (void)setZoomFactor:(CGFloat)zoomFactor smooth:(BOOL)isSmooth{
     if (zoomFactor < 1.0)
         return;
     
@@ -1142,8 +1143,11 @@ NSString *const kGPUImageYUVVideoRangeConversionForLAFragmentShaderString = SHAD
     if (zoomFactor < _inputCamera.activeFormat.videoMaxZoomFactor) {
         if (zoomFactor > kMaxZoomFactor)
             zoomFactor = kMaxZoomFactor;
-        
-        _inputCamera.videoZoomFactor = zoomFactor;
+        if (isSmooth) {
+            [_inputCamera rampToVideoZoomFactor:zoomFactor withRate:self.smoothZoomRate];
+        } else {
+            _inputCamera.videoZoomFactor = zoomFactor;
+        }
         _zoomFactor = zoomFactor;
     }
     [_inputCamera unlockForConfiguration];
