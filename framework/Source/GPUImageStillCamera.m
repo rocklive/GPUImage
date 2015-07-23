@@ -118,7 +118,20 @@ void GPUImageCreateResizedSampleBuffer(CVPixelBufferRef cameraFrame, CGSize fina
     return self;
 }
 
-- (id)initWithSessionPreset:(NSString *)sessionPreset cameraPosition:(AVCaptureDevicePosition)cameraPosition photoOutputSettings:(NSDictionary *)photoSettings;
+- (id)initWithSessionPreset:(NSString *)sessionPreset
+             cameraPosition:(AVCaptureDevicePosition)cameraPosition
+        photoOutputSettings:(NSDictionary *)photoSettings
+{
+    return [self initWithSessionPreset:sessionPreset
+                        cameraPosition:cameraPosition
+                   photoOutputSettings:photoSettings
+                            setupBlock:nil];
+}
+
+- (id)initWithSessionPreset:(NSString *)sessionPreset
+             cameraPosition:(AVCaptureDevicePosition)cameraPosition
+        photoOutputSettings:(NSDictionary *)photoSettings
+                 setupBlock:(void (^)(GPUImageVideoCamera*))setupBlock
 {
     if (!(self = [super initWithSessionPreset:sessionPreset cameraPosition:cameraPosition]))
     {
@@ -150,6 +163,9 @@ void GPUImageCreateResizedSampleBuffer(CVPixelBufferRef cameraFrame, CGSize fina
     }
     
     [self.captureSession addOutput:photoOutput];
+    
+    if (setupBlock)
+        setupBlock(self);
     
     [self.captureSession commitConfiguration];
     

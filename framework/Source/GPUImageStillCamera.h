@@ -12,6 +12,11 @@ void GPUImageCreateResizedSampleBuffer(CVPixelBufferRef cameraFrame, CGSize fina
              cameraPosition:(AVCaptureDevicePosition)cameraPosition
         photoOutputSettings:(NSDictionary *)photoSettings;
 
+- (id)initWithSessionPreset:(NSString *)sessionPreset
+             cameraPosition:(AVCaptureDevicePosition)cameraPosition
+        photoOutputSettings:(NSDictionary *)photoSettings
+                 setupBlock:(void (^)(GPUImageVideoCamera*))setupBlock;
+
 @property CGFloat jpegCompressionQuality;
 
 // Only reliably set inside the context of the completion handler of one of the capture methods
