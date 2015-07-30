@@ -378,6 +378,9 @@
 - (void)newFrameReadyAtTime:(CMTime)frameTime atIndex:(NSInteger)textureIndex;
 {
     runSynchronouslyOnVideoProcessingQueue(^{
+        if ([[UIApplication sharedApplication] applicationState] != UIApplicationStateActive)
+            return;
+        
         [GPUImageContext setActiveShaderProgram:displayProgram];
         [self setDisplayFramebuffer];
         
