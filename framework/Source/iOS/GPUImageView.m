@@ -378,7 +378,9 @@
 - (void)newFrameReadyAtTime:(CMTime)frameTime atIndex:(NSInteger)textureIndex;
 {
     runSynchronouslyOnVideoProcessingQueue(^{
-        if ([[UIApplication sharedApplication] applicationState] != UIApplicationStateActive)
+        // we can't use != UIApplicationStateActive comparison, because on some device if GPUImageView skips
+        // rendering of a frame in inactive state, a camera starts drop frames
+        if ([[UIApplication sharedApplication] applicationState] == UIApplicationStateBackground)
             return;
         
         [GPUImageContext setActiveShaderProgram:displayProgram];
