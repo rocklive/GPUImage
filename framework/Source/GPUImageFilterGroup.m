@@ -37,6 +37,13 @@
     return [filters count];
 }
 
+- (void)setPreventRendering:(BOOL)preventRendering {
+    for (GPUImageFilter *currentFilter in _initialFilters)
+    {
+        currentFilter.preventRendering = preventRendering;
+    }
+}
+
 #pragma mark -
 #pragma mark Still image processing
 

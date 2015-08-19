@@ -16,4 +16,6 @@
 - (GPUImageOutput<GPUImageInput> *)filterAtIndex:(NSUInteger)filterIndex;
 - (NSUInteger)filterCount;
 
+- (void)setPreventRendering:(BOOL)preventRendering;
+
 @end
