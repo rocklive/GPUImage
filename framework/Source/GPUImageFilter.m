@@ -647,7 +647,7 @@ NSString *const kGPUImagePassthroughFragmentShaderString = SHADER_STRING
 
 - (void)setInputSize:(CGSize)newSize atIndex:(NSInteger)textureIndex;
 {
-    if (self.preventRendering)
+    if (self.preventRendering && inputTextureSize.width > 0 && inputTextureSize.height > 0)
     {
         return;
     }
