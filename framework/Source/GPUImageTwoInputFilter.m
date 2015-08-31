@@ -147,14 +147,20 @@ NSString *const kGPUImageTwoInputTextureVertexShaderString = SHADER_STRING
 {
     if (textureIndex == 0)
     {
+        if (hasSetFirstFrameBuffer)
+            [firstInputFramebuffer unlock];
         firstInputFramebuffer = newInputFramebuffer;
         hasSetFirstTexture = YES;
         [firstInputFramebuffer lock];
+        hasSetFirstFrameBuffer = YES;
     }
     else
     {
+        if (hasSetSecondFrameBuffer)
+            [secondInputFramebuffer unlock];
         secondInputFramebuffer = newInputFramebuffer;
         [secondInputFramebuffer lock];
+        hasSetSecondFrameBuffer = YES;
     }
 }
 
@@ -258,6 +264,8 @@ NSString *const kGPUImageTwoInputTextureVertexShaderString = SHADER_STRING
         [super newFrameReadyAtTime:passOnFrameTime atIndex:0]; // Bugfix when trying to record: always use time from first input (unless indefinite, in which case use the second input)
         hasReceivedFirstFrame = NO;
         hasReceivedSecondFrame = NO;
+        hasSetFirstFrameBuffer = NO;
+        hasSetSecondFrameBuffer = NO;
     }
 }
 
