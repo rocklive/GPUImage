@@ -80,44 +80,47 @@
 
 - (void)updateWithTimestamp:(CMTime)frameTime;
 {
-    [GPUImageContext useImageProcessingContext];
-    
-    CGSize layerPixelSize = [self layerSizeInPixels];
-    
-    GLubyte *imageData = (GLubyte *) calloc(1, (int)layerPixelSize.width * (int)layerPixelSize.height * 4);
-    
-    CGColorSpaceRef genericRGBColorspace = CGColorSpaceCreateDeviceRGB();    
-    CGContextRef imageContext = CGBitmapContextCreate(imageData, (int)layerPixelSize.width, (int)layerPixelSize.height, 8, (int)layerPixelSize.width * 4, genericRGBColorspace,  kCGBitmapByteOrder32Little | kCGImageAlphaPremultipliedFirst);
-//    CGContextRotateCTM(imageContext, M_PI_2);
-	CGContextTranslateCTM(imageContext, 0.0f, layerPixelSize.height);
-    CGContextScaleCTM(imageContext, layer.contentsScale, -layer.contentsScale);
-    //        CGContextSetBlendMode(imageContext, kCGBlendModeCopy); // From Technical Q&A QA1708: http://developer.apple.com/library/ios/#qa/qa1708/_index.html
-    
-    [layer renderInContext:imageContext];
-    
-    CGContextRelease(imageContext);
-    CGColorSpaceRelease(genericRGBColorspace);
-    
-    // TODO: This may not work
-    outputFramebuffer = [[GPUImageContext sharedFramebufferCache] fetchFramebufferForSize:layerPixelSize textureOptions:self.outputTextureOptions onlyTexture:YES];
-
-    glBindTexture(GL_TEXTURE_2D, [outputFramebuffer texture]);
-    // no need to use self.outputTextureOptions here, we always need these texture options
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, (int)layerPixelSize.width, (int)layerPixelSize.height, 0, GL_BGRA, GL_UNSIGNED_BYTE, imageData);
-    
-    free(imageData);
-    
-    for (id<GPUImageInput> currentTarget in targets)
-    {
-        if (currentTarget != self.targetToIgnoreForUpdates)
+    runSynchronouslyOnVideoProcessingQueue(^{
+        [GPUImageContext useImageProcessingContext];
+        
+        CGSize layerPixelSize = [self layerSizeInPixels];
+        
+        GLubyte *imageData = (GLubyte *) calloc(1, (int)layerPixelSize.width * (int)layerPixelSize.height * 4);
+        
+        CGColorSpaceRef genericRGBColorspace = CGColorSpaceCreateDeviceRGB();
+        CGContextRef imageContext = CGBitmapContextCreate(imageData, (int)layerPixelSize.width, (int)layerPixelSize.height, 8, (int)layerPixelSize.width * 4, genericRGBColorspace,  kCGBitmapByteOrder32Little | kCGImageAlphaPremultipliedFirst);
+        //    CGContextRotateCTM(imageContext, M_PI_2);
+        CGContextTranslateCTM(imageContext, 0.0f, layerPixelSize.height);
+        CGContextScaleCTM(imageContext, layer.contentsScale, -layer.contentsScale);
+        //        CGContextSetBlendMode(imageContext, kCGBlendModeCopy); // From Technical Q&A QA1708: http://developer.apple.com/library/ios/#qa/qa1708/_index.html
+        
+        [layer renderInContext:imageContext];
+        
+        CGContextRelease(imageContext);
+        CGColorSpaceRelease(genericRGBColorspace);
+        
+        // TODO: This may not work
+        outputFramebuffer = [[GPUImageContext sharedFramebufferCache] fetchFramebufferForSize:layerPixelSize textureOptions:self.outputTextureOptions onlyTexture:YES];
+        
+        glBindTexture(GL_TEXTURE_2D, [outputFramebuffer texture]);
+        // no need to use self.outputTextureOptions here, we always need these texture options
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, (int)layerPixelSize.width, (int)layerPixelSize.height, 0, GL_BGRA, GL_UNSIGNED_BYTE, imageData);
+        
+        free(imageData);
+        
+        for (id<GPUImageInput> currentTarget in targets)
         {
-            NSInteger indexOfObject = [targets indexOfObject:currentTarget];
-            NSInteger textureIndexOfTarget = [[targetTextureIndices objectAtIndex:indexOfObject] integerValue];
-            
-            [currentTarget setInputSize:layerPixelSize atIndex:textureIndexOfTarget];
-            [currentTarget newFrameReadyAtTime:frameTime atIndex:textureIndexOfTarget];
+            if (currentTarget != self.targetToIgnoreForUpdates)
+            {
+                NSInteger indexOfObject = [targets indexOfObject:currentTarget];
+                NSInteger textureIndexOfTarget = [[targetTextureIndices objectAtIndex:indexOfObject] integerValue];
+                
+                [currentTarget setInputSize:layerPixelSize atIndex:textureIndexOfTarget];
+                [currentTarget setInputFramebuffer:outputFramebuffer atIndex:textureIndexOfTarget];
+                [currentTarget newFrameReadyAtTime:frameTime atIndex:textureIndexOfTarget];
+            }
         }
-    }    
+    });
 }
 
 @end
