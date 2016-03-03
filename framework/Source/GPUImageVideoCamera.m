@@ -100,7 +100,7 @@ NSString *const kGPUImageYUVVideoRangeConversionForLAFragmentShaderString = SHAD
 	AVCaptureAudioDataOutput *audioOutput;
     NSDate *startingCaptureTime;
 	
-    dispatch_queue_t cameraProcessingQueue, audioProcessingQueue;
+    dispatch_queue_t audioProcessingQueue;
     
     GLProgram *yuvConversionProgram;
     GLint yuvConversionPositionAttribute, yuvConversionTextureCoordinateAttribute;
@@ -151,7 +151,6 @@ NSString *const kGPUImageYUVVideoRangeConversionForLAFragmentShaderString = SHAD
 		return nil;
     }
     
-    cameraProcessingQueue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH,0);
 	audioProcessingQueue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW,0);
 
     frameRenderingSemaphore = dispatch_semaphore_create(1);
@@ -196,7 +195,7 @@ NSString *const kGPUImageYUVVideoRangeConversionForLAFragmentShaderString = SHAD
 	
 	// Add the video frame output	
 	videoOutput = [[AVCaptureVideoDataOutput alloc] init];
-	[videoOutput setAlwaysDiscardsLateVideoFrames:NO];
+	[videoOutput setAlwaysDiscardsLateVideoFrames:YES];
     
 //    if (captureAsYUV && [GPUImageContext deviceSupportsRedTextures])
     if (captureAsYUV && [GPUImageContext supportsFastTextureUpload])
@@ -280,7 +279,7 @@ NSString *const kGPUImageYUVVideoRangeConversionForLAFragmentShaderString = SHAD
         }
     });
     
-    [videoOutput setSampleBufferDelegate:self queue:cameraProcessingQueue];
+    [videoOutput setSampleBufferDelegate:self queue:[GPUImageContext sharedContextQueue]];
 	if ([_captureSession canAddOutput:videoOutput])
 	{
 		[_captureSession addOutput:videoOutput];
@@ -955,24 +954,12 @@ NSString *const kGPUImageYUVVideoRangeConversionForLAFragmentShaderString = SHAD
     }
     else
     {
-        if (dispatch_semaphore_wait(frameRenderingSemaphore, DISPATCH_TIME_NOW) != 0)
+        //Feature Detection Hook.
+        if (self.delegate)
         {
-            return;
+            [self.delegate willOutputSampleBuffer:sampleBuffer];
         }
-        
-        CFRetain(sampleBuffer);
-        runAsynchronouslyOnVideoProcessingQueue(^{
-            //Feature Detection Hook.
-            if (self.delegate)
-            {
-                [self.delegate willOutputSampleBuffer:sampleBuffer];
-            }
-            
-            [self processVideoSampleBuffer:sampleBuffer];
-            
-            CFRelease(sampleBuffer);
-            dispatch_semaphore_signal(frameRenderingSemaphore);
-        });
+        [self processVideoSampleBuffer:sampleBuffer];
     }
 }
 
