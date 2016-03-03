@@ -36,9 +36,10 @@
     }
     
 #if TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE
+    __weak typeof (self) weakSelf = self;
     memoryWarningObserver = [[NSNotificationCenter defaultCenter] addObserverForName:UIApplicationDidReceiveMemoryWarningNotification object:nil queue:nil usingBlock:^(NSNotification *note) {
         
-        [self purgeAllUnassignedFramebuffers];
+        [weakSelf purgeAllUnassignedFramebuffers];
 	}];
 #else
 #endif
