@@ -100,7 +100,7 @@ NSString *const kGPUImageYUVVideoRangeConversionForLAFragmentShaderString = SHAD
 	AVCaptureAudioDataOutput *audioOutput;
     NSDate *startingCaptureTime;
 	
-    dispatch_queue_t audioProcessingQueue;
+    dispatch_queue_t cameraProcessingQueue, audioProcessingQueue;
     
     GLProgram *yuvConversionProgram;
     GLint yuvConversionPositionAttribute, yuvConversionTextureCoordinateAttribute;
@@ -151,6 +151,7 @@ NSString *const kGPUImageYUVVideoRangeConversionForLAFragmentShaderString = SHAD
 		return nil;
     }
     
+    cameraProcessingQueue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH,0);
 	audioProcessingQueue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW,0);
 
     frameRenderingSemaphore = dispatch_semaphore_create(1);
@@ -279,7 +280,7 @@ NSString *const kGPUImageYUVVideoRangeConversionForLAFragmentShaderString = SHAD
         }
     });
     
-    [videoOutput setSampleBufferDelegate:self queue:[GPUImageContext sharedContextQueue]];
+    [videoOutput setSampleBufferDelegate:self queue:cameraProcessingQueue];
 	if ([_captureSession canAddOutput:videoOutput])
 	{
 		[_captureSession addOutput:videoOutput];
@@ -954,12 +955,21 @@ NSString *const kGPUImageYUVVideoRangeConversionForLAFragmentShaderString = SHAD
     }
     else
     {
-        //Feature Detection Hook.
-        if (self.delegate)
+        if (dispatch_semaphore_wait(frameRenderingSemaphore, DISPATCH_TIME_NOW) != 0)
         {
-            [self.delegate willOutputSampleBuffer:sampleBuffer];
+            return;
         }
-        [self processVideoSampleBuffer:sampleBuffer];
+        
+        runSynchronouslyOnVideoProcessingQueue(^{
+            if (self.delegate)
+            {
+                [self.delegate willOutputSampleBuffer:sampleBuffer];
+            }
+            
+            [self processVideoSampleBuffer:sampleBuffer];
+        });
+        
+        dispatch_semaphore_signal(frameRenderingSemaphore);
     }
 }
 
