@@ -203,7 +203,9 @@ void GPUImageCreateResizedSampleBuffer(CVPixelBufferRef cameraFrame, CGSize fina
     [photoOutput captureStillImageAsynchronouslyFromConnection:connection completionHandler:^(CMSampleBufferRef imageSampleBuffer, NSError *error) {
         
         if (error) {
-            dispatch_semaphore_signal(frameRenderingSemaphore);
+            if (pauseProcessing) {
+                dispatch_semaphore_signal(frameRenderingSemaphore);
+            }
             block(nil, error);
             return;
         }
