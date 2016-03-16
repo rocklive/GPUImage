@@ -1132,24 +1132,28 @@ NSString *const kGPUImageYUVVideoRangeConversionForLAFragmentShaderString = SHAD
 }
 
 - (void)setZoomFactor:(CGFloat)zoomFactor smooth:(BOOL)isSmooth{
-    if (zoomFactor < 1.0)
+    if (_zoomFactor == zoomFactor) {
+        return;
+    }
+    
+    if (zoomFactor < 1.0 || zoomFactor > _inputCamera.activeFormat.videoMaxZoomFactor)
         return;
     
+    if (zoomFactor > kMaxZoomFactor)
+        zoomFactor = kMaxZoomFactor;
+    
     NSError *error = nil;
-    [_inputCamera lockForConfiguration:&error];
-    if (zoomFactor < _inputCamera.activeFormat.videoMaxZoomFactor) {
-        if (zoomFactor > kMaxZoomFactor)
-            zoomFactor = kMaxZoomFactor;
+    if ([_inputCamera lockForConfiguration:&error])
+    {
         if (isSmooth) {
             [_inputCamera rampToVideoZoomFactor:zoomFactor withRate:self.smoothZoomRate];
         } else {
             _inputCamera.videoZoomFactor = zoomFactor;
         }
+        [_inputCamera unlockForConfiguration];
+        
         _zoomFactor = zoomFactor;
-    }
-    [_inputCamera unlockForConfiguration];
-    
-    if (error != nil) {
+    } else {
         NSLog(@"Can't apply zoom factor %f for %@. Error %@", zoomFactor, self, error);
     }
 }
