@@ -406,6 +406,10 @@
         
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
         
+        if (self.forceTransparency) {
+            glDisable(GL_BLEND);
+        }
+        
         [self presentFramebuffer];
         [inputFramebufferForDisplay unlock];
         inputFramebufferForDisplay = nil;
