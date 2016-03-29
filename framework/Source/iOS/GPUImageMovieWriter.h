@@ -48,6 +48,7 @@ extern NSString *const kGPUImageColorSwizzlingFragmentShaderString;
 @property(nonatomic, copy) NSArray *metaData;
 @property(nonatomic, assign, getter = isPaused) BOOL paused;
 @property(nonatomic, retain) GPUImageContext *movieWriterContext;
+@property(nonatomic, assign, getter=isFBORebuildingEnable) BOOL FBORebuildingEnabled;
 
 // Initialization and teardown
 - (id)initWithMovieURL:(NSURL *)newMovieURL size:(CGSize)newSize;

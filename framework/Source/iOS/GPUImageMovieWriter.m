@@ -786,6 +786,11 @@ NSString *const kGPUImageColorSwizzlingFragmentShaderString = SHADER_STRING
             {
                 CVPixelBufferRelease(pixel_buffer);
             }
+            else
+            {
+                if (self.FBORebuildingEnabled)
+                    [self destroyDataFBO];
+            }
         };
         
         write();
