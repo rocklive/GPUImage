@@ -619,10 +619,12 @@ NSString *const kGPUImageColorSwizzlingFragmentShaderString = SHADER_STRING
             if (renderTexture)
             {
                 CFRelease(renderTexture);
+                renderTexture = nil;
             }
             if (renderTarget)
             {
                 CVPixelBufferRelease(renderTarget);
+                renderTarget = nil;
             }
             
         }
