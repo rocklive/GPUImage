@@ -64,12 +64,6 @@ NSString *const kGPUImageThreeInputTextureVertexShaderString = SHADER_STRING
     return self;
 }
 
-- (void)dealloc{
-    runSynchronouslyOnVideoProcessingQueue(^{
-        glDisableVertexAttribArray(filterThirdTextureCoordinateAttribute);
-    });
-}
-
 - (void)initializeAttributes;
 {
     [super initializeAttributes];
